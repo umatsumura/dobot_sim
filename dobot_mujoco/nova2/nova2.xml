@@ -1,51 +1,185 @@
 <mujoco model="nova2_robot">
-  <compiler angle="radian" meshdir="./meshes/" autolimits="true"/>
+  <compiler angle="radian" meshdir="./assets/" autolimits="true" />
 
   <option timestep="0.004" integrator="implicitfast" />
 
+  <default>
+    <default class="nova2">
+      <geom type="mesh" material="white" />
+      <default class="finger">
+        <joint type="slide" armature="0.243" damping="40" />
+        <!--
+        The joint and control ranges are in meters, representing the linear displacement of the
+        finger on the rail. Note that the real robot takes in a float value representing the
+        position of the dynamixel servo, which actuates rotors and moves the fingers along the
+        the rail. We choose to model the displacement of the finger on the rail instead of the
+        position of the servo because the former is a more interpretable value.
+
+        Some useful values:
+        Length of rail = 12cm
+        Width of finger base = 1.9cm
+
+        Joint range should be (0.0cm, 4.1cm). This represents the _physical_ limits of the
+        fingers sliding along the rail. The 0 position represents when the inner edge of
+        the finger bases are touching each other at exactly the center of the rail.
+        4.1cm represents the outer edge of the finger bases touching the edge of the rail.
+        So the value always represents the distance from the inner edge of the finger base
+        to the center of the rail.
+
+        Control range is (0.2cm, 3.7cm). This represents measured values from a real robot
+        where the gripper is actuated to its fully closed and fully open positions. Therefore the
+        control range represents limits enforced by _software_ on the real robot.
+      -->
+        <position ctrlrange="0.002 0.037" kp="2000" kv="124" />
+        <default class="left_finger">
+          <joint range="0 0.041" axis="0 0 -1" />
+        </default>
+        <default class="right_finger">
+          <joint range="0 0.041" axis="0 0 -1" />
+        </default>
+      </default>
+      <default class="visual">
+        <geom type="mesh" mass="0" group="2" material="black" contype="0" conaffinity="0" />
+      </default>
+      <default class="collision">
+        <geom group="3" type="mesh" condim="6" friction="1 5e-3 5e-4" solref=".01 1" />
+        <default class="sphere_collision">
+          <geom type="sphere" size="0.0006" rgba="1 0 0 1" />
+        </default>
+      </default>
+    </default>
+  </default>
+
   <asset>
-    <mesh name="base_link" file="base_link.STL"/>
-    <mesh name="Link1" file="Link1.STL"/>
-    <mesh name="Link2" file="Link2.STL"/>
-    <mesh name="Link3" file="Link3.STL"/>
-    <mesh name="Link4" file="Link4.STL"/>
-    <mesh name="Link5" file="Link5.STL"/>
-    <mesh name="Link6" file="Link6.STL"/>
+    <material name="white" rgba="1 1 1 1" />
+    <material name="gray" rgba="0.753 0.753 0.753 1" />
+    <material name="black" rgba="0.149 0.149 0.149 1" />
+
+    <mesh name="base_link" file="base_link.STL" />
+    <mesh name="Link1" file="Link1.STL" />
+    <mesh name="Link2" file="Link2.STL" />
+    <mesh name="Link3" file="Link3.STL" />
+    <mesh name="Link4" file="Link4.STL" />
+    <mesh name="Link5" file="Link5.STL" />
+    <mesh name="Link6" file="Link6.STL" />
+    <mesh file="vx300s_7_gripper_prop.stl" />
+    <mesh file="vx300s_7_gripper_bar.stl" />
+    <mesh file="vx300s_7_gripper_wrist_mount.stl" />
+    <mesh file="vx300s_8_custom_finger_left.stl" />
+    <mesh file="vx300s_8_custom_finger_right.stl" />
+    <mesh file="d405_solid.stl" />
   </asset>
 
   <worldbody>
-    <geom name="base_link_visual" type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.792157 0.819608 0.933333 1" mesh="base_link"/>
-    <geom name="base_link_collision" type="mesh" rgba="0.792157 0.819608 0.933333 1" mesh="base_link"/>
-    <body name="Link1" pos="0 0 0.2234" gravcomp="1" >
-      <inertial pos="-5.44523e-07 -0.0218723 -0.023624" quat="0.68064 0.194942 -0.194429 0.678914" mass="0.803371" diaginertia="0.00174547 0.00167953 0.000761257"/>
+    <geom name="base_link_visual" type="mesh" contype="0" conaffinity="0" group="1" density="0"
+      rgba="0.792157 0.819608 0.933333 1" mesh="base_link" />
+    <geom name="base_link_collision" type="mesh" rgba="0.792157 0.819608 0.933333 1"
+      mesh="base_link" />
+    <body name="Link1" pos="0 0 0.2234" gravcomp="1" childclass="nova2">
+      <inertial pos="-5.44523e-07 -0.0218723 -0.023624" quat="0.68064 0.194942 -0.194429 0.678914"
+        mass="0.803371" diaginertia="0.00174547 0.00167953 0.000761257" />
       <joint name="joint1" pos="0 0 0" axis="0 0 1" range="-6.28 6.28" actuatorgravcomp="true" />
-      <geom name="Link1_visual" type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.792157 0.819608 0.933333 1" mesh="Link1"/>
-      <geom name="Link1_collision" type="mesh" rgba="0.792157 0.819608 0.933333 1" mesh="Link1"/>
+      <geom name="Link1_visual" type="mesh" contype="0" conaffinity="0" group="1" density="0"
+        rgba="0.792157 0.819608 0.933333 1" mesh="Link1" />
+      <geom name="Link1_collision" type="mesh" rgba="0.792157 0.819608 0.933333 1" mesh="Link1" />
       <body name="Link2" quat="0.499998 0.5 0.5 -0.500002" gravcomp="1">
-        <inertial pos="-0.150314 4.18878e-06 0.0931448" quat="-0.000228542 0.68671 -0.00021032 0.726931" mass="1.57816" diaginertia="0.021802 0.0216397 0.00150112"/>
+        <inertial pos="-0.150314 4.18878e-06 0.0931448"
+          quat="-0.000228542 0.68671 -0.00021032 0.726931" mass="1.57816"
+          diaginertia="0.021802 0.0216397 0.00150112" />
         <joint name="joint2" pos="0 0 0" axis="0 0 1" range="-3.14 3.14" actuatorgravcomp="true" />
-        <geom name="Link2_visual" type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.792157 0.819608 0.933333 1" mesh="Link2"/>
-        <geom name="Link2_collision" type="mesh" rgba="0.792157 0.819608 0.933333 1" mesh="Link2"/>
+        <geom name="Link2_visual" type="mesh" contype="0" conaffinity="0" group="1" density="0"
+          rgba="0.792157 0.819608 0.933333 1" mesh="Link2" />
+        <geom name="Link2_collision" type="mesh" rgba="0.792157 0.819608 0.933333 1" mesh="Link2" />
         <body name="Link3" pos="-0.28 0 0" gravcomp="1">
-          <inertial pos="-0.118295 3.91201e-06 0.0113008" quat="0.000458863 0.72892 0.000484955 0.684598" mass="0.998674" diaginertia="0.00943528 0.00938205 0.00074159"/>
+          <inertial pos="-0.118295 3.91201e-06 0.0113008"
+            quat="0.000458863 0.72892 0.000484955 0.684598" mass="0.998674"
+            diaginertia="0.00943528 0.00938205 0.00074159" />
           <joint name="joint3" pos="0 0 0" axis="0 0 1" range="-2.79 2.79" actuatorgravcomp="true" />
-          <geom name="Link3_visual" type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.792157 0.819608 0.933333 1" mesh="Link3"/>
-          <geom name="Link3_collision" type="mesh" rgba="0.792157 0.819608 0.933333 1" mesh="Link3"/>
+          <geom name="Link3_visual" type="mesh" contype="0" conaffinity="0" group="1" density="0"
+            rgba="0.792157 0.819608 0.933333 1" mesh="Link3" />
+          <geom name="Link3_collision" type="mesh" rgba="0.792157 0.819608 0.933333 1" mesh="Link3" />
           <body name="Link4" pos="-0.22501 0 0.1175" quat="0.707105 0 0 -0.707108" gravcomp="1">
-            <inertial pos="-7.47431e-06 -0.022655 -0.0204587" quat="0.649109 0.281112 -0.280926 0.648624" mass="0.441609" diaginertia="0.000682766 0.000641172 0.000255324"/>
+            <inertial pos="-7.47431e-06 -0.022655 -0.0204587"
+              quat="0.649109 0.281112 -0.280926 0.648624" mass="0.441609"
+              diaginertia="0.000682766 0.000641172 0.000255324" />
             <joint name="joint4" pos="0 0 0" axis="0 0 1" range="-6.28 6.28" actuatorgravcomp="true" />
-            <geom name="Link4_visual" type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.792157 0.819608 0.933333 1" mesh="Link4"/>
-            <geom name="Link4_collision" type="mesh" rgba="0.792157 0.819608 0.933333 1" mesh="Link4"/>
+            <geom name="Link4_visual" type="mesh" contype="0" conaffinity="0" group="1" density="0"
+              rgba="0.792157 0.819608 0.933333 1" mesh="Link4" />
+            <geom name="Link4_collision" type="mesh" rgba="0.792157 0.819608 0.933333 1"
+              mesh="Link4" />
             <body name="Link5" pos="0 -0.12 0" quat="0.707105 0.707108 0 0" gravcomp="1">
-              <inertial pos="-2.62723e-06 0.00191303 -0.00761123" quat="0.39382 0.587388 -0.587225 0.393762" mass="0.574835" diaginertia="0.00069052 0.000663177 0.000348157"/>
-              <joint name="joint5" pos="0 0 0" axis="0 0 1" range="-6.28 6.28" actuatorgravcomp="true" />
-              <geom name="Link5_visual" type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.792157 0.819608 0.933333 1" mesh="Link5"/>
-              <geom name="Link5_collision" type="mesh" rgba="0.792157 0.819608 0.933333 1" mesh="Link5"/>
+              <inertial pos="-2.62723e-06 0.00191303 -0.00761123"
+                quat="0.39382 0.587388 -0.587225 0.393762" mass="0.574835"
+                diaginertia="0.00069052 0.000663177 0.000348157" />
+              <joint name="joint5" pos="0 0 0" axis="0 0 1" range="-6.28 6.28"
+                actuatorgravcomp="true" />
+              <geom name="Link5_visual" type="mesh" contype="0" conaffinity="0" group="1"
+                density="0" rgba="0.792157 0.819608 0.933333 1" mesh="Link5" />
+              <geom name="Link5_collision" type="mesh" rgba="0.792157 0.819608 0.933333 1"
+                mesh="Link5" />
               <body name="Link6" pos="0 0.088004 0" quat="0.707105 -0.707108 0 0" gravcomp="1">
-                <inertial pos="-4.63325e-07 -4.9271e-05 -0.0196921" quat="0.000664386 0.707106 0.000664386 0.707106" mass="0.124247" diaginertia="7.67224e-05 4.99145e-05 4.97045e-05"/>
-                <joint name="joint6" pos="0 0 0" axis="0 0 1" range="-6.28 6.28" actuatorgravcomp="true" />
-                <geom name="Link6_visual" type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.792157 0.819608 0.933333 1" mesh="Link6"/>
-                <geom name="Link6_collision" type="mesh" rgba="0.792157 0.819608 0.933333 1" mesh="Link6"/>
+                <inertial pos="-4.63325e-07 -4.9271e-05 -0.0196921"
+                  quat="0.000664386 0.707106 0.000664386 0.707106" mass="0.124247"
+                  diaginertia="7.67224e-05 4.99145e-05 4.97045e-05" />
+                <joint name="joint6" pos="0 0 0" axis="0 0 1" range="-6.28 6.28"
+                  actuatorgravcomp="true" />
+                <geom name="Link6_visual" type="mesh" contype="0" conaffinity="0" group="1"
+                  density="0" rgba="0.792157 0.819608 0.933333 1" mesh="Link6" />
+                <geom name="Link6_collision" type="mesh" rgba="0.792157 0.819608 0.933333 1"
+                  mesh="Link6" />
+                <body name="left/gripper_base" euler="0 0 -1.5708" pos="0 0 0.035">
+                  <inertial pos="0.000182154 -0.0341589 -0.0106026"
+                    quat="0.435286 0.557074 -0.551539 0.442718"
+                    mass="0.42158" diaginertia="0.00110438 0.000790537 0.000469727" />
+                  <geom class="visual" mesh="vx300s_7_gripper_prop" />
+                  <geom class="collision" mesh="vx300s_7_gripper_prop" />
+                  <geom class="visual" mesh="vx300s_7_gripper_bar" />
+                  <geom class="collision" mesh="vx300s_7_gripper_bar" />
+                  <geom class="visual" pos="0 -0.03525 -0.0227" quat="0 -1 0 -1" type="mesh"
+                    mesh="vx300s_7_gripper_wrist_mount" />
+                  <geom class="collision" pos="0 -0.03525 -0.0227" quat="0 -1 0 -1" type="mesh"
+                    mesh="vx300s_7_gripper_wrist_mount" />
+                  <geom class="visual" pos="0 -0.0824748 -0.0095955" quat="0 0 -0.21644 -0.976296"
+                    type="mesh" mesh="d405_solid" />
+                  <geom class="collision" pos="0 -0.0824748 -0.0095955"
+                    quat="0 0 -0.21644 -0.976296" type="mesh" mesh="d405_solid" />
+                  <camera name="wrist_cam_left" pos="0 -0.0824748 -0.0095955" mode="fixed"
+                    euler="2.70525955359 0 0"
+                    focal="1.93e-3 1.93e-3" resolution="1280 720" sensorsize="3896e-6 2140e-6" />
+                  <body name="left/left_finger_link" pos="0.0191 -0.0141637 0.0211727"
+                    quat="1 -1 -1 1">
+                    <inertial pos="0.0143478 -0.0284791 0.0122897"
+                      quat="0.535486 0.458766 -0.450407 0.547651"
+                      mass="0.0862937" diaginertia="5.86848e-05 4.46887e-05 1.8397e-05" />
+                    <joint name="left/left_finger" class="left_finger" />
+                    <geom pos="0.0141637 0.0211727 0.06" class="visual" quat="1 1 1 -1" type="mesh"
+                      mesh="vx300s_8_custom_finger_left" />
+                    <geom pos="0.0141637 0.0211727 0.06" class="collision" quat="1 1 1 -1"
+                      type="mesh"
+                      mesh="vx300s_8_custom_finger_left" />
+                    <geom name="left/left_g0" pos="0.013  -0.0892 0.0268" class="sphere_collision" />
+                    <geom name="left/left_g1" pos="0.0222 -0.0892 0.0268" class="sphere_collision" />
+                    <geom name="left/left_g2" pos="0.0182 -0.0845 0.0266" class="sphere_collision" />
+                    <site name="left/left_finger" pos="0.015 -0.06 0.02" />
+                  </body>
+                  <body name="left/right_finger_link" pos="-0.0191 -0.0141637 0.0211727"
+                    quat="1 1 1 1">
+                    <inertial pos="0.0143711 0.0284792 0.0121421"
+                      quat="0.461317 0.537615 -0.545478 0.447894"
+                      mass="0.0862932" diaginertia="5.86828e-05 4.46887e-05 1.83949e-05" />
+                    <joint name="left/right_finger" class="right_finger" />
+                    <geom pos="0.0141637 -0.0211727 0.0597067" class="visual" quat="1 -1 -1 -1"
+                      type="mesh"
+                      mesh="vx300s_8_custom_finger_right" />
+                    <geom pos="0.0141637 -0.0211727 0.0597067" class="collision" quat="1 -1 -1 -1"
+                      type="mesh"
+                      mesh="vx300s_8_custom_finger_right" />
+                    <geom name="left/right_g0" pos="0.013  0.0892 0.0268" class="sphere_collision" />
+                    <geom name="left/right_g1" pos="0.0222 0.0892 0.0268" class="sphere_collision" />
+                    <geom name="left/right_g2" pos="0.0182 0.0845 0.0266" class="sphere_collision" />
+                    <site name="left/right_finger" pos="0.015 0.06 0.02" />
+                  </body>
+                </body>
               </body>
             </body>
           </body>
@@ -54,6 +188,7 @@
     </body>
   </worldbody>
 
+
   <actuator>
     <position name="joint1" joint="joint1" inheritrange="1" kp="1500" kv="100" forcerange="-80 80" />
     <position name="joint2" joint="joint2" inheritrange="1" kp="1500" kv="100" forcerange="-80 80" />
@@ -61,9 +196,16 @@
     <position name="joint4" joint="joint4" inheritrange="1" kp="1500" kv="100" forcerange="-60 60" />
     <position name="joint5" joint="joint5" inheritrange="1" kp="1500" kv="100" forcerange="-60 60" />
     <position name="joint6" joint="joint6" inheritrange="1" kp="1500" kv="100" forcerange="-30 30" />
+    <position class="finger" name="left/gripper" joint="left/left_finger"/>
   </actuator>
 
+  <equality>
+    <joint joint1="left/left_finger" joint2="left/right_finger" polycoef="0 1 0 0 0" />
+    <!-- <joint joint1="right/left_finger" joint2="right/right_finger" polycoef="0 1 0 0 0" /> -->
+  </equality>
+
   <keyframe>
-    <key name="home" qpos="-1.5708 0 -1.5708 0 1.5708 1.5708" ctrl="-1.5708 0 -1.5708 0 1.5708 1.5708"/>
+    <key name="home" qpos="-1.5708 0 -1.5708 0 1.5708 1.5708 0 0"
+      ctrl="-1.5708 0 -1.5708 0 1.5708 1.5708 0" />
   </keyframe>
 </mujoco>

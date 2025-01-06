@@ -55,9 +55,9 @@ if __name__=="__main__":
     dobot_mujoco = DobotMujoco(model_path=model_path)
     dobot_mujoco.start()
     while True:
-        dobot_mujoco.servoj(np.array([0, 0, -90, 0, 90, 90]))
+        dobot_mujoco.servoj(np.array([0, 0, -90, 0, 90, 90, 0]))
         time.sleep(3)
         print(dobot_mujoco.get_joint())
-        dobot_mujoco.servoj(np.array([-90, -45, -90, 45, 90, 90]))
+        dobot_mujoco.servoj(np.array([-90, -45, -90, 45, 90, 90, 5]))
         time.sleep(3)
         print(dobot_mujoco.get_joint())
