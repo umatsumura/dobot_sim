@@ -6,6 +6,7 @@ import threading
 import mujoco
 import mujoco.viewer
 import numpy as np
+import cv2
 
 class DobotMujoco:
     def __init__(self, model_path:str) -> None:
@@ -13,6 +14,7 @@ class DobotMujoco:
         self.data = mujoco.MjData(self.model)
         mujoco.mj_resetDataKeyframe(self.model, self.data, 0)
         self.viewer = mujoco.viewer.launch_passive(self.model, self.data)
+        self.renderer = mujoco.Renderer(self.model, 480, 640)
         self.lock = threading.Lock()
         self._thread = threading.Thread(target=self.sim_thread)
         time.sleep(0.5)
@@ -31,6 +33,9 @@ class DobotMujoco:
             step_start = time.perf_counter()
             with self.lock:
                 mujoco.mj_step(self.model, self.data)
+                self.renderer.update_scene(self.data, camera="wrist_cam_left")
+                cam_img = self.renderer.render()
+                cv2.imwrite("cam.png", cam_img)
                 self.viewer.sync()
                 time_until_next_step = self.model.opt.timestep - (
                 time.perf_counter() - step_start
@@ -58,6 +63,6 @@ if __name__=="__main__":
         dobot_mujoco.servoj(np.array([0, 0, -90, 0, 90, 90, 0]))
         time.sleep(3)
         print(dobot_mujoco.get_joint())
-        dobot_mujoco.servoj(np.array([-90, -45, -90, 45, 90, 90, 5]))
+        dobot_mujoco.servoj(np.array([-90, -45, -90, 120, 90, 90, 5]))
         time.sleep(3)
         print(dobot_mujoco.get_joint())
